@@ -40,10 +40,10 @@ export class ZrxError extends Error {
 
 export class ZrxSwapper implements Swapper {
   public static swapperName = 'ZrxSwapper'
-  deps: ZrxSwapperDeps
+  deps: Promise<ZrxSwapperDeps>
 
-  constructor(deps: ZrxSwapperDeps) {
-    this.deps = deps
+  constructor(deps: ZrxSwapperDeps | Promise<ZrxSwapperDeps>) {
+    this.deps = Promise.resolve(deps)
   }
 
   getType() {
@@ -51,7 +51,7 @@ export class ZrxSwapper implements Swapper {
   }
 
   async buildQuoteTx(args: BuildQuoteTxInput): Promise<Quote<ChainTypes, SwapperType>> {
-    return ZrxBuildQuoteTx(this.deps, args)
+    return ZrxBuildQuoteTx(await this.deps, args)
   }
 
   async getQuote(input: GetQuoteInput): Promise<Quote<ChainTypes, SwapperType>> {
@@ -82,20 +82,20 @@ export class ZrxSwapper implements Swapper {
   }
 
   async executeQuote(args: ExecQuoteInput<ChainTypes, SwapperType>): Promise<ExecQuoteOutput> {
-    return ZrxExecuteQuote(this.deps, args)
+    return ZrxExecuteQuote(await this.deps, args)
   }
 
   async approvalNeeded(
     args: ApprovalNeededInput<ChainTypes, SwapperType>
   ): Promise<ApprovalNeededOutput> {
-    return ZrxApprovalNeeded(this.deps, args)
+    return ZrxApprovalNeeded(await this.deps, args)
   }
 
   async approveInfinite(args: ApproveInfiniteInput<ChainTypes, SwapperType>): Promise<string> {
-    return ZrxApproveInfinite(this.deps, args)
+    return ZrxApproveInfinite(await this.deps, args)
   }
 
   async getSendMaxAmount(args: SendMaxAmountInput): Promise<string> {
-    return getZrxSendMaxAmount(this.deps, args)
+    return getZrxSendMaxAmount(await this.deps, args)
   }
 }
